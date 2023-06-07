@@ -1,6 +1,6 @@
 # Museformer with Noise
 CS470 Team1 Code
-Based on 
+Based on references below : 
 1. Paper: [Museformer: Transformer with Fine- and Coarse-Grained Attention for Music Generation](https://arxiv.org/abs/2210.10349), by Botao Yu, Peiling Lu, Rui Wang, Wei Hu, Xu Tan, Wei Ye, Shikun Zhang, Tao Qin, Tie-Yan Liu, NeurIPS 2022
 2. Github Repository: https://github.com/microsoft/muzic/tree/main 
 
@@ -40,7 +40,7 @@ Then, run the following command to gather the tokens for each split.
 token_dir=data/token
 split_dir=data/split
 for split in train valid test : 
-	do python tools/generate_token_data_by_file_list.py pre_clean/meta/${split}.txt $token_dir $split_dir ;
+	do python tools/generate_token_data_by_file_list.py data/meta/${split}.txt $token_dir $split_dir ;
 done
 ```
 
