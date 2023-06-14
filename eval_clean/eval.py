@@ -5,6 +5,7 @@ import sys
 import glob
 import math
 import shutil
+import random
 import subprocess
 import pretty_midi # pip install pretty_midi
 import joblib # pip install joblib
@@ -12,10 +13,11 @@ import joblib # pip install joblib
 ###############################################################################
 # 0. Configuration variables
 
-NUM_REFERENCE = 7
+NUM_REPEAT = 3000
+NUM_REFERENCE = 50
 NUM_CLASS = 255
-NGRAM = [3, 4]
-NGRAM_WEIGHT = {3: 1/2, 4: 1/2}
+NGRAM = [2, 3, 4]
+NGRAM_WEIGHT = {2: 1/3, 3: 1/3, 4: 1/3}
 
 ###############################################################################
 # 1. Midi helper functions
@@ -61,6 +63,7 @@ def midi_to_txt(midi_path, TXT_PATH):
     
     midi = pretty_midi.PrettyMIDI(midi_path)
     if not contains_inst(midi, 80):
+        print(f'{midi_path} has no square synthesizer')
         return False
     
     f = open(os.path.join(TXT_PATH, MIDI_NAME + '.txt'), 'w')
@@ -86,7 +89,7 @@ def midis_to_txt(MIDI_PATH, TXT_PATH):
         print(f'Start generating text files into {TXT_PATH}')
         os.makedirs(TXT_PATH, exist_ok=True)
 
-        midi_list = glob.glob(os.path.join(MIDI_PATH, '*.mid'))[0:NUM_REFERENCE]
+        midi_list = glob.glob(os.path.join(MIDI_PATH, '*.mid'))[0:1000]
         statistics = joblib.Parallel(n_jobs=-1, verbose=1)(
             joblib.delayed(midi_to_txt)(midi, TXT_PATH)
             for midi in midi_list)
@@ -220,9 +223,11 @@ def compute_bleu(hash_file_name, full_dict, HASH_PATH):
 
 def compute_self_bleu(TXT_PATH, HASH_PATH):
     hash_list = glob.glob(os.path.join(TXT_PATH, '*.txt'))
+    random.shuffle(hash_list)
+    hash_list = hash_list[0:NUM_REFERENCE]
     hash_name_list = [hash.split('/')[-1] for hash in hash_list]
 
-    print('Start retrieving dictionaries')
+    #print('Start retrieving dictionaries')
     full_dict = {}
     for ngram in NGRAM:
         NGRAM_PATH = os.path.join(HASH_PATH, str(ngram))
@@ -231,18 +236,19 @@ def compute_self_bleu(TXT_PATH, HASH_PATH):
             HASH_FILE_PATH = os.path.join(NGRAM_PATH, hash_file_name)
             dictionary[hash_file_name] = hash_file_to_dict(HASH_FILE_PATH)
         full_dict[ngram] = dictionary
-    print('Finished retrieving dictionaries                                ')
-    print()
+    #print('Finished retrieving dictionaries                                ')
+    #print()
 
-    print('Start computing self-bleu')
-    bleu_list = joblib.Parallel(n_jobs=-1, verbose=5)(
+    #print('Start computing self-bleu')
+    bleu_list = joblib.Parallel(n_jobs=-1, verbose=0)(
             joblib.delayed(compute_bleu)(hash_file_name, full_dict, HASH_PATH)
             for hash_file_name in hash_name_list)
     bleu_list = [bleu for bleu in bleu_list if bleu is not None]
     sum_bleu = sum(bleu_list)
     self_bleu = sum_bleu / len(hash_name_list)
-    print('Finished computing self-bleu          ')
-    print(f'self_bleu = {self_bleu:.3f}')
+    #print('Finished computing self-bleu          ')
+    #print(f'self_bleu = {self_bleu:.3f}')
+    return self_bleu
 
 ###############################################################################
 
@@ -255,8 +261,11 @@ def main():
 
     midis_to_txt(MIDI_PATH, TXT_PATH)
     generate_hash_table(TXT_PATH, HASH_PATH)
-    compute_self_bleu(TXT_PATH, HASH_PATH)
-
+    self_bleu_sum = 0
+    for i in range(NUM_REPEAT):
+     self_bleu_sum += compute_self_bleu(TXT_PATH, HASH_PATH)
+     print(f'{i}/{NUM_REPEAT}\r', end='')
+    print(f'Mean self_bleu: {self_bleu_sum / NUM_REPEAT}')
     return 0
 
 if __name__ == '__main__':
