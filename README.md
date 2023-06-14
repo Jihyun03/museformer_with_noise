@@ -134,7 +134,7 @@ The following guide shows how to use eval_clean.
    ```bash
    python3 eval.py
    ```
-   (MIDI files in the midi directory currently are examples.)
+   (MIDI files in the midi directory currently are examples. Please locate the files to evaluate instead of the original files.)
 
 ## 6. Inference: MIDI generation
 
