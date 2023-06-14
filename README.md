@@ -96,6 +96,8 @@ We used hardware and software environment below for training and other all proce
 
 ## 3. Train
 
+In ./museformer/attention/self_attention_v2s1/rpe_self_attention_v2s1.py, there is a part marked with comment ‘cs470’ where you can apply adaptive noise to the attention mechanism. This is added to increase the diversity of MIDI results that our model can generate. If you want to train the model without noise, please change the value of variable 'apply_noise' from 'True' to 'False'. (Which is defined & used in 'cs470' comment part of rpe_self_attention_v2s1.py)
+
 Run the following command to train Museformer:
 
 ```bash
