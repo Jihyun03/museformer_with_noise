@@ -45,4 +45,5 @@ fairseq-train \
   --tensorboard-logdir tb_log/$MODEL_NAME  \
   --num-workers "$OMP_NUM_THREADS" \
   --save-dir checkpoints/$MODEL_NAME \
+  --beat-mask-ts True \
   | tee log/${MODEL_NAME}.log
