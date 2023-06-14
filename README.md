@@ -22,7 +22,7 @@ The following guide shows how to use pre_clean.
    ```bash
    python3 data_preprocess.py
    ```
-Note that if COPY_MIDI is set to true, the pre_clean directory must be located at museformer/pre_clean. After preprocessing, put all the MIDI files in `data/midi` and meta data in 'data/meta'.
+Note that if COPY_MIDI is set to true, the pre_clean directory must be located at museformer/pre_clean. After preprocessing, put all the MIDI files in `data/midi` and meta data in 'data/meta'. (Please make the directory data/meta.)
 
 
 ### 1.2. Turn into tokens
