@@ -8,14 +8,6 @@ The following content describes the steps to run Museformer with noise using Lak
 All the commands are run at the root directory unless specified.
 
 
-# Our code: Self-BLEU
-We designed codes for computing the Self-BLEU metric. You can find the codes in the eval_clean directory. The code computes the Self-BLEU of the given MIDI dataset. Following guide shows how to use eval_clean.
-Install the requirements.txt with command
-pip install -r requirements.txt
-Fill in the midi directory with midi files to be evaluated.
-Set configuration variables in eval.py as desired.
-Then run eval.py to obtain self-bleu.
-
 ## 1. Dataset
 
 ### 1.1 Our code: MIDI preprocessor
