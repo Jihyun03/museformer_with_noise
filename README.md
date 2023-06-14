@@ -7,15 +7,31 @@ Based on references below :
 The following content describes the steps to run Museformer with noise using Lakh MIDI dataset. 
 All the commands are run at the root directory unless specified.
 
+
+# Our code: Self-BLEU
+We designed codes for computing the Self-BLEU metric. You can find the codes in the eval_clean directory. The code computes the Self-BLEU of the given MIDI dataset. Following guide shows how to use eval_clean.
+Install the requirements.txt with command
+pip install -r requirements.txt
+Fill in the midi directory with midi files to be evaluated.
+Set configuration variables in eval.py as desired.
+Then run eval.py to obtain self-bleu.
+
 ## 1. Dataset
 
-### 1.1 MIDI compression
-We use [the Lakh MIDI dataset](https://colinraffel.com/projects/lmd/) (LMD-full). 
-Specifically, we first preprocess it following the description in the Museformer paper. 
-The final dataset (see the file lists [here](data/meta)) contains 29,940 MIDI files. 
-The instruments are normalized to 6 basic ones: square synthesizer (80), piano (0), guitar (25), string (48), bass (43), drum, where in the parentheses are MIDI program IDs if applicable. 
+### 1.1 Our code: MIDI preprocessor
+We designed a MIDI preprocessor as Museformer didn’t contain codes for MIDI preprocessing. You can find the codes in the pre_clean directory. The code downloads the lmd-full dataset and preprocesses MIDI files following the description in the Museformer paper. The instruments are normalized to 6 basic ones: square synthesizer (80), piano (0), guitar (25), string (48), bass (43), and drum, wherein the parentheses are MIDI program IDs if applicable. After the preprocess, we could get 21,911 MIDI files.
 
-Put all the MIDI files in `data/midi`.
+The following guide shows how to use pre_clean.
+1. Install the requirements.txt with the command below.
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Run data_preprocess.py with desired configuration variables COPY_MIDI and NUM_MIDI.
+   ```bash
+   python3 data_preprocess.py
+   ```
+Note that if COPY_MIDI is set to true, the pre_clean directory must be located at museformer/pre_clean. After preprocessing, put all the MIDI files in `data/midi` and meta data in 'data/meta'.
+
 
 ### 1.2. Turn into tokens
 Install [MidiProcessor](https://github.com/btyu/MidiProcessor). Then, encode the MIDI files into tokens:
@@ -98,13 +114,11 @@ In our experiment, we run it on 4 GPUs, and the batch size is set to 1, so the r
 
 By modifying `con2con` and `con2sum`, you can control the bars for the fine-grained attention and the coarse-grained attention, respectively.
 
-**[General Use]** Please add `--beat-mask-ts True` for the `fairseq-train` commend.
-
 In your first run, it may take some time to build up auxiliary information and compile CUDA kernels, so you may take a cup of coffee at this moment.
 
-You can download a checkpoint [here](https://1drv.ms/u/s!Aq3YEPZCcV5ibz9ySjjNsEB74CQ), and put it in `checkpoints/mf-lmd6remi-1` for evaluation and inference.
+You can download a checkpoint [here](https://1drv.ms/u/s!Aq3YEPZCcV5ibz9ySjjNsEB74CQ) given by the authors of the Museformer paper, and put it in `checkpoints/mf-lmd6remi-1` for evaluation and inference.
 
-## 4. Evaluation
+## 4. Evaluation 1 - Perplexity (From the paper)
 
 You can obtain perplexity on the test set with the following command:
 
@@ -114,7 +128,20 @@ bash tval/val__mf-lmd6remi-x.sh 1 checkpoint_best.pt 10240
 
 The number `10240` indicates the maximum sequence length for calculation.
 
-## 5. Inference
+## 5. Evaluation 2 - Self-BLEU (Our code)
+We designed codes for computing the Self-BLEU metric. You can find the codes in the eval_clean directory. The code computes the Self-BLEU of the given MIDI dataset. 
+
+The following guide shows how to use eval_clean.
+1. Install the requirements.txt with the command below.
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Fill in the midi directory with midi files to be evaluated. Set configuration variables in eval.py as desired. Then run eval.py to obtain self-bleu.
+   ```bash
+   python3 eval.py
+   ```
+
+## 6. Inference: MIDI generation
 
 Use the following command to generate 5 music pieces, with the random seed set to 1:
 
