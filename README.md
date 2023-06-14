@@ -163,5 +163,6 @@ python tools/batch_generate_midis.py --encoding-method REMIGEN2 --input-dir outp
 ```
 
 You should see the MIDI files in `output/generation`.
+Also, you can check some MIDI examples that we generated in the directory 'generated_music_example'.
 
 
